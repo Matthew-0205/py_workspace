@@ -1,0 +1,117 @@
+import boto3
+from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
+import json
+import time
+
+CHUNK_SIZE = 512  # Binary chunk size (hex will be ~2x larger)
+OUTPUT_FILE = 'firmware.hex'  # Local file to save hex data
+BYTES_PER_LINE = 10
+BUCKET_NAME = 'pai-ota-test-bucket-2'
+TOPIC_BASE = "psm/firmware/update"
+ACK_TOPIC = "psm/firmware/ack"
+ACK_TIMEOUT = 5
+
+# Initialize the S3 client
+s3_client = boto3.client(
+  's3',
+  aws_access_key_id="",
+  aws_secret_access_key=""
+)
+
+def read_object_content(bucket_name, object_key):
+  # Download the object content
+  response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+  
+  # Read the content of the object
+  object_content = response['Body']
+  
+  return object_content
+
+def connect_mqtt():
+    # Credentials configuration
+    endpoint = "a17kkqj3vtdek4-ats.iot.us-east-2.amazonaws.com"
+    root_ca_path = "./ota_sim/ews_CA.pem"
+    certificate_path = "./ota_sim/ews_cert.crt"
+    private_key_path = "./ota_sim/ews-private.pem.key"
+    client_id = "ews"
+    
+    mqtt_client = AWSIoTMQTTClient(client_id)
+    mqtt_client.configureEndpoint(endpoint, 8883)
+    mqtt_client.configureCredentials(root_ca_path, private_key_path, certificate_path)
+
+    # Core connection configuration
+    mqtt_client.configureAutoReconnectBackoffTime(1, 32, 20)
+    mqtt_client.configureOfflinePublishQueueing(-1)
+    mqtt_client.configureDrainingFrequency(2)
+    mqtt_client.configureConnectDisconnectTimeout(10)
+    mqtt_client.configureMQTTOperationTimeout(5)
+    
+    mqtt_client.connect()
+    mqtt_client.subscribe(ACK_TOPIC, 1, MQTT_Incoming_Publish_Handler)
+    print("Connected to AWS IoT and subscribed to {ACK_TOPIC}")
+    
+    return mqtt_client
+
+
+def s3_fw_read():
+  try:
+      # Get firmware stream from S3
+      print(f"Attempting to read from S3:")
+      firmware_stream = read_object_content(BUCKET_NAME, "picotarget.bin")
+      
+      # Get total size from ContentLength
+      total_size = firmware_stream._content_length
+      print(f"Total firmware size: {total_size} bytes")
+
+      # Read and process in chunks
+      chunk_number = 0
+      total_bytes_read = 0
+
+      with open(OUTPUT_FILE, 'w') as f:
+         f.write("")  # Ensure file is empty to start
+      
+      for chunk in firmware_stream.iter_chunks(chunk_size=CHUNK_SIZE):
+          # Convert to hex with 0x prefix for each byte
+          hex_chunk = [f"0x{byte:02x}" for byte in chunk]
+          print(f"Converted to {len(hex_chunk)} hex bytes")
+
+          # Write hex to file
+          with open(OUTPUT_FILE, 'a') as f:
+             for i in range(0, len(hex_chunk), BYTES_PER_LINE):
+                line = hex_chunk[i:i + BYTES_PER_LINE]
+                f.write(' '.join(line) + '\n')
+          print(f"Hex data written to {OUTPUT_FILE}")
+          
+          # Track total bytes read
+          chunk_size_bytes = len(chunk)
+          total_bytes_read += chunk_size_bytes
+          
+          # Print some info about the chunk
+          print(f"Chunk {chunk_number}:")
+          print(f"  Binary size: {chunk_size_bytes} bytes")
+          print(f"  Hex size: {len(hex_chunk)} characters")
+          print(f"  First 32 hex chars: {hex_chunk[:5]}...")
+          print(f"  Total bytes read so far: {total_bytes_read}/{total_size}")
+          print("-" * 50)
+          
+          chunk_number += 1
+
+      # Verify we read everything
+      if total_bytes_read == int(total_size):
+        print("Successfully read entire file!")
+      else:
+        print(f"Warning: Read {total_bytes_read} bytes, expected {total_size}")
+
+  except Exception as e:
+    print(f"Error: {str(e)}")
+
+if __name__ == "__main__":
+    # s3_fw_read()
+    mqtt_client = connect_mqtt()
+    topic= "psm/random"
+    payload= json.dumps({"message":"success"})
+    print("payload", payload)
+    print("topic", topic)
+    while(1):
+      mqtt_client.publish(topic, payload, 1)
+      time.sleep(3)

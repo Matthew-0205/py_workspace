@@ -1,0 +1,17 @@
+No response received after 3 retries, continue with next request
+Traceback (most recent call last):
+  File "/home/pai/Documents/sunspec_pai/solar_irradiation_sensor/solar_irradiation_test.py", line 61, in <module>
+    irradiation = sensor.read_irradiation()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pai/Documents/sunspec_pai/solar_irradiation_sensor/solar_irradiation_test.py", line 20, in read_irradiation
+    result = self.client.read_holding_registers(address = 0x0000, count = 1,slave = self.slave_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pai/Documents/sunspec_pai/lib/python3.11/site-packages/pymodbus/client/mixin.py", line 113, in read_holding_registers
+    return self.execute(no_response_expected, pdu_reg.ReadHoldingRegistersRequest(address=address, count=count, dev_id=slave))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pai/Documents/sunspec_pai/lib/python3.11/site-packages/pymodbus/client/base.py", line 203, in execute
+    return self.transaction.sync_execute(no_response_expected, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pai/Documents/sunspec_pai/lib/python3.11/site-packages/pymodbus/transaction/transaction.py", line 147, in sync_execute
+    raise ModbusIOException(txt)
+pymodbus.exceptions.ModbusIOException: Modbus Error: [Input/Output] No response received after 3 retries, continue with next request

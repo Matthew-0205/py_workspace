@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/home/pai/Documents/sunspec_pai/solar_irradiation_sensor/solar_irradiation_test.py", line 64, in <module>
+    time.sleep(1)
+KeyboardInterrupt

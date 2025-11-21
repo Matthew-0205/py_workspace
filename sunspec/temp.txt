@@ -1,0 +1,31 @@
+Value at address 40000 is 1400204883
+SunSpec marker found at address 40000
+Model ID: 1 at address 40002, length: 65
+Model ID: 113 at address 40069, length: 60
+Model ID: 120 at address 40131, length: 26
+Model ID: 121 at address 40159, length: 30
+Model ID: 122 at address 40191, length: 44
+Model ID: 123 at address 40237, length: 24
+Model ID: 160 at address 40263, length: 48
+End of model list.
+ac_current 21.849998474121094
+ph_a_current 7.099999904632568
+ph_b_current 7.339999675750732
+ph_c_current 7.339999675750732
+ph_ab_voltage 401.8000183105469
+ph_bc_voltage 407.6000061035156
+ph_ca_voltage 407.3999938964844
+ph_an_voltage 232.10000610351562
+ph_bn_voltage 235.10000610351562
+ph_cn_voltage 234.90000915527344
+ac_pwr 5001.0
+ac_freq 49.97999954223633
+ac_va 5001.47607421875
+ac_var -69.0
+ac_pf 99.990478515625
+ac_energy 38833300.0
+dc_current nan
+dc_voltage nan
+dc_power 4949.94482421875
+tmp_cab nan
+state 4
