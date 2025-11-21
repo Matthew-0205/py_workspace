@@ -130,7 +130,13 @@ def main():
         logger.info("enter 'quit' for closing the server")
 
         server.start()
-
+        slave_0 = server.add_slave(1)
+        name = "Sunspec"
+        addr = 40000
+        slave_0.add_block(name, cst.HOLDING_REGISTERS, addr, 10024)
+        slave_0.set_values(name, addr, fronius_inverter )
+        
+        
         slave_1 = server.add_slave(81)
         name = "Sunspec"
         addr = 40000

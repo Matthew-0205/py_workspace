@@ -27,7 +27,7 @@ class SunSpecSystem:
             return None
 
         while True:
-            result = self.client.read_holding_registers(addr, count = 2, slave=self.slave_id)
+            result = self.client.read_holding_registers(addr, count = 2, device_id =self.slave_id)
             if result.isError():
                 print(f"Error reading at address {addr}")
                 break
@@ -102,7 +102,7 @@ class FruniouEcoPara(SunSpecSystem):
 
     def __init__(self, slave_id):
         client = ModbusSerialClient(
-            port='/dev/ttyUSB0',
+            port='/dev/ttyUSB1',
             baudrate=9600,
             parity='N',
             stopbits=1,
